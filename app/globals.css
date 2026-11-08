@@ -1,15 +1,24 @@
 @import "tailwindcss";
 
+/* ============================================================
+   شاهدت — "دارك روم" هوية بصرية
+   الفكرة: ضوء البروجكتور في قاعة معتمة، ورق بسمار، خيوط عنبر دافئة.
+   No neon red. No glass blur spam. One accent, spent carefully.
+   ============================================================ */
+
 :root {
-  --background: #080c14;
-  --foreground: #f8fafc;
-  --cinema-red: #e50914;
-  --cinema-red-glow: rgba(229, 9, 20, 0.4);
-  --gold-star: #ffb800;
-  --surface-card: #0f172a;
-  --surface-card-hover: #1e293b;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --font-jakarta: ui-sans-serif, system-ui, sans-serif;
+  --s-dark: #12100c;      /* قاع القاعة */
+  --s-raised: #1b1710;    /* لوح مرفوع */
+  --s-panel: #221d14;     /* ألواح الترحيب */
+  --s-line: #38301f;      /* خطوط بنية خفيفة */
+  --s-ivory: #f3ecdd;     /* نص أساسي */
+  --s-ivory-dim: #cfc4ab; /* نص ثانوي */
+  --s-muted: #948b76;     /* نص خامل */
+  --s-amber: #f2b441;     /* ضوء البروجكتور — الأكسنت الوحيد */
+  --s-amber-deep: #a97f1f;
+  --s-danger: #c45050;    /* حذف فقط */
+  --s-green: #7ba05a;     /* إتمام فقط */
+  --border-subtle: rgba(243, 236, 221, 0.08);
 }
 
 html {
@@ -17,81 +26,105 @@ html {
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: var(--s-dark);
+  color: var(--s-ivory);
   min-height: 100vh;
   overflow-x: hidden;
-  font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-family: var(--font-plex-ar), var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "kern";
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* ---------- Accessibility: unified focus ring ---------- */
+/* ---------- Focus ring (aluminum) ---------- */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid #ff4d55;
+  outline: 2px solid var(--s-amber);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
-/* ---------- Custom Cinema Scrollbar ---------- */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+::selection {
+  background: var(--s-amber);
+  color: var(--s-dark);
 }
 
-::-webkit-scrollbar-track {
-  background: #080c14;
+/* ---------- Scrollbar: dim strip ---------- */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--s-dark); }
+::-webkit-scrollbar-thumb { background: #2e281c; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--s-amber-deep); }
+
+/* ---------- Shared primitives ---------- */
+/* لوح فاتح مرفوع بأخاديد الفيلم — بدل الزجاج */
+.panel {
+  background: var(--s-raised);
+  border: 1px solid var(--s-line);
+  border-radius: 14px;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 9999px;
+.panel-hover {
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+.panel-hover:hover {
+  border-color: rgba(242, 180, 65, 0.45);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #e50914;
+/* زر رئيسي: عنبري صلب، بلا توهج */
+.btn-solid {
+  background: var(--s-amber);
+  color: var(--s-dark);
+  border-radius: 10px;
+  font-weight: 700;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.btn-solid:hover { filter: brightness(1.08); }
+.btn-solid:active { transform: scale(0.97); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--s-ivory-dim);
+  border: 1px solid var(--s-line);
+  border-radius: 10px;
+  font-weight: 600;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.btn-ghost:hover { border-color: var(--s-amber-deep); color: var(--s-ivory); }
+
+/* حقل إدخال */
+.field {
+  background: #0d0b08;
+  border: 1px solid var(--s-line);
+  border-radius: 10px;
+  color: var(--s-ivory);
+  transition: border-color 0.15s ease;
+}
+.field:focus { border-color: var(--s-amber-deep); outline: none; }
+.field::placeholder { color: var(--s-muted); }
+
+/* معدّة المودال */
+.modal-surface {
+  background: var(--s-panel);
+  border: 1px solid var(--s-line);
+  border-radius: 18px;
 }
 
-/* ---------- Glassmorphism helpers ---------- */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+/* خط عنوان صغير */
+.eyebrow {
+  color: var(--s-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
 }
 
-.glass-panel-hover:hover {
-  background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(229, 9, 20, 0.35);
-  box-shadow: 0 10px 30px -10px rgba(229, 9, 20, 0.2);
-}
+/* شريط شعرة أفقي */
+.hairline { border-color: var(--s-line); }
 
-.cinema-glow {
-  box-shadow: 0 0 25px -5px rgba(229, 9, 20, 0.4);
-}
-
-.gold-glow {
-  box-shadow: 0 0 15px -3px rgba(255, 184, 0, 0.4);
-}
-
-/* ---------- Utilities ---------- */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  *,
-  *::before,
-  *::after {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

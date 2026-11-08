@@ -1,25 +1,25 @@
 import type { Metadata } from 'next';
-import { Cairo, Plus_Jakarta_Sans } from 'next/font/google';
+import { IBM_Plex_Sans_Arabic, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { TrackingProvider } from '@/lib/store/tracking-context';
 
-const cairo = Cairo({
+const plexAr = IBM_Plex_Sans_Arabic({
   subsets: ['arabic', 'latin'],
-  variable: '--font-cairo',
+  variable: '--font-plex-ar',
   display: 'swap',
-  weight: ['400', '500', '600', '700', '800', '900'],
+  weight: ['300', '400', '500', '600', '700'],
 });
 
-const jakarta = Plus_Jakarta_Sans({
+const grotesk = Space_Grotesk({
   subsets: ['latin'],
-  variable: '--font-jakarta',
+  variable: '--font-grotesk',
   display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '700'],
 });
 
 export const metadata: Metadata = {
-  title: 'شاهدت | Shahadt - تتبع الأفلام والمسلسلات',
-  description: 'تطبيقك السينمائي الأنيق لتتبع ما تشاهده وما أتممته من أفلام ومسلسلات مع جلب البيانات من توب سينما وأهواك تي في',
+  title: 'شاهدت — سجل مشاهداتك',
+  description: 'دفتر شخصي أنيق لتتبع الأفلام والمسلسلات التي تشاهدها، مع جلب البيانات تلقائياً من توب سينما وأهواك.',
   keywords: ['أفلام', 'مسلسلات', 'تتبع الأفلام', 'توب سينما', 'أهواك تي في', 'Shahadt', 'Movie Tracker'],
 };
 
@@ -29,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl" className={`${cairo.variable} ${jakarta.variable}`}>
-      <body className="font-sans bg-[#080C14] text-slate-100 min-h-screen selection:bg-red-600 selection:text-white">
+    <html lang="ar" dir="rtl" className={`${plexAr.variable} ${grotesk.variable}`}>
+      <body className="min-h-screen selection:bg-[#f2b441] selection:text-[#12100c]">
         <TrackingProvider>
           {children}
         </TrackingProvider>

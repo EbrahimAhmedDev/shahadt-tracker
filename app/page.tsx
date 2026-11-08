@@ -9,7 +9,7 @@ import { AddMediaModal } from '@/components/AddMediaModal';
 import { MediaDetailModal } from '@/components/MediaDetailModal';
 import { useTracking } from '@/lib/store/tracking-context';
 import { UserTracking } from '@/types/media';
-import { Film, Play, Sparkles, Plus, Clapperboard, Heart } from 'lucide-react';
+import { Film, Play, Plus, Clapperboard } from 'lucide-react';
 
 export default function Home() {
   const { items, activeTab, filterType, searchFilter, t, language } = useTracking();
@@ -50,80 +50,98 @@ export default function Home() {
   }, [items]);
 
   return (
-    <div className="min-h-screen bg-[#080C14] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#12100c] text-[#f3ecdd] flex flex-col">
       {/* Top Navigation */}
       <Navbar onOpenAddModal={() => setIsAddModalOpen(true)} />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        
-        {/* Cinema Hero Spotlight (if watching exists) */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-5 sm:px-8 py-8">
+
+        {/* بطاقة الإبراز — عنوان فيلم، بلا زجاج ولا توهج */}
         {featuredItem && featuredItem.media && (
-          <div className="relative mb-8 rounded-3xl overflow-hidden glass-panel border border-white/10 p-6 sm:p-10 shadow-2xl">
-            {/* Ambient Backdrop */}
-            <div className="absolute inset-0 bg-gradient-to-r from-red-950/40 via-slate-950/80 to-[#080C14] z-0" />
+          <div className="relative mb-10 overflow-hidden rounded-2xl border hairline bg-[#1b1710]">
+            {/* البوستر كإضاءة مجاورة من الجهة */}
             {featuredItem.media.posterUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={featuredItem.media.posterUrl}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover blur-xl opacity-20 z-0"
-              />
+              <div className="absolute inset-0 flex" aria-hidden>
+                <div className="absolute inset-0 bg-[#1b1710]" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={featuredItem.media.posterUrl}
+                  alt=""
+                  className="absolute h-full w-1/3 object-cover opacity-[0.22] blur-2xl"
+                  style={{ insetInlineEnd: 0 }}
+                />
+                <div className="absolute inset-0"
+                  style={{ background: 'linear-gradient(to left, transparent, #1b1710 55%)' }}
+                />
+              </div>
             )}
 
-            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="max-w-2xl">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="px-3 py-1 rounded-full text-xs font-black bg-red-600 text-white shadow-lg shadow-red-600/40 flex items-center gap-1.5 uppercase tracking-wider">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    {featuredItem.status === 'watching' ? t.watching : t.completed}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-400">
+            <div className="relative z-10 flex gap-8 p-7 sm:p-10 items-start">
+              <div className="flex-1 min-w-0">
+                {/* سطر حدّة */}
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="eyebrow">
                     {featuredItem.media.type === 'series' ? t.series : t.movie}
-                    {featuredItem.media.releaseYear ? ` • ${featuredItem.media.releaseYear}` : ''}
+                    {featuredItem.media.releaseYear ? ` · ${featuredItem.media.releaseYear}` : ''}
+                  </span>
+                  <span className="h-px flex-1 max-w-[80px] bg-[#f2b441]/50" aria-hidden />
+                  <span className="text-[0.72rem] text-[#f2b441]">
+                    {featuredItem.status === 'watching' ? t.watching : t.completed}
                   </span>
                 </div>
 
-                <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-3">
+                <h1 className="text-[1.7rem] sm:text-[2.4rem] font-bold text-[#f3ecdd] leading-[1.25] mb-4">
                   {language === 'ar'
                     ? featuredItem.media.titleAr
                     : (featuredItem.media.titleEn || featuredItem.media.titleAr)}
                 </h1>
 
                 {featuredItem.media.overview && (
-                  <p className="text-sm text-slate-300 line-clamp-2 leading-relaxed mb-4">
+                  <p className="text-[0.85rem] text-[#cfc4ab] leading-[1.9] line-clamp-2 max-w-xl mb-6">
                     {featuredItem.media.overview}
                   </p>
                 )}
 
-                <div className="flex items-center gap-3">
+                {featuredItem.status === 'watching' && featuredItem.totalEpisodes ? (
+                  <div className="max-w-xs mb-6">
+                    <div className="flex justify-between text-[0.7rem] text-[#948b76] mb-1.5 tabular-nums">
+                      <span>{t.episode} {featuredItem.currentEpisode || 0} / {featuredItem.totalEpisodes}</span>
+                      <span className="text-[#f2b441]">{Math.round(((featuredItem.currentEpisode || 0) / featuredItem.totalEpisodes) * 100)}%</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: '#2e281c' }}>
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${((featuredItem.currentEpisode || 0) / featuredItem.totalEpisodes) * 100}%`, background: 'var(--s-amber)' }}
+                      />
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="flex items-center gap-2.5">
                   <button
                     onClick={() => setSelectedItem(featuredItem)}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-950 hover:bg-slate-200 shadow-xl transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                    className="btn-solid px-5 py-2.5 text-[0.82rem]"
                   >
-                    <Play className="w-4 h-4 fill-slate-950" />
-                    <span>{t.viewDetails}</span>
-                  </button>
-                  <button
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all cursor-pointer"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>{t.addMedia}</span>
+                    <span className="flex items-center gap-2">
+                      <Play className="w-3.5 h-3.5" />
+                      {t.viewDetails}
+                    </span>
                   </button>
                 </div>
               </div>
 
-              {/* Poster Thumbnail */}
+              {/* البوستر المسطح — البطل الحقيقي */}
               {featuredItem.media.posterUrl && (
                 <div
                   onClick={() => setSelectedItem(featuredItem)}
-                  className="hidden md:block w-36 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 flex-shrink-0 cursor-pointer hover:scale-105 transition-transform"
+                  className="hidden md:block w-44 lg:w-52 aspect-[2/3] overflow-hidden rounded-lg shrink-0 cursor-pointer"
+                  style={{ boxShadow: '0 1px 0 rgba(243,236,221,0.12), 0 20px 40px -20px rgba(0,0,0,0.7)' }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={featuredItem.media.posterUrl}
-                    alt=""
+                    alt={featuredItem.media.titleAr}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -132,7 +150,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Quick Stats Summary */}
+        {/* الأرقام كسطر واحد */}
         <StatsSummary />
 
         {/* Filter Navigation Tabs */}
@@ -140,7 +158,7 @@ export default function Home() {
 
         {/* Media Grid */}
         {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 my-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5 my-8">
             {filteredItems.map((item) => (
               <MediaCard
                 key={item.id}
@@ -151,37 +169,28 @@ export default function Home() {
           </div>
         ) : (
           /* Empty State */
-          <div className="my-16 flex flex-col items-center justify-center text-center glass-panel p-10 rounded-3xl border border-white/5 max-w-lg mx-auto">
-            <div className="w-16 h-16 rounded-3xl bg-slate-900 flex items-center justify-center text-slate-500 mb-4 border border-white/5">
-              <Film className="w-8 h-8 stroke-[1.5]" />
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2">{t.emptyList}</h3>
-            <p className="text-xs sm:text-sm text-slate-400 mb-6 leading-relaxed">
-              {t.emptyListSub}
-            </p>
+          <div className="my-16 flex flex-col items-center justify-center text-center max-w-sm mx-auto py-12 px-6 rounded-2xl border hairline bg-[#1b1710]">
+            <Film className="w-8 h-8 text-[#38301f] mb-5" strokeWidth={1.5} />
+            <h3 className="text-base font-semibold text-[#f3ecdd] mb-2">{t.emptyList}</h3>
+            <p className="text-[0.8rem] text-[#948b76] leading-relaxed mb-6">{t.emptyListSub}</p>
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 transition-all cursor-pointer"
+              className="btn-solid px-5 py-2.5 text-[0.82rem]"
             >
-              <Plus className="w-4 h-4" />
-              <span>{t.addMedia}</span>
+              {t.addMedia}
             </button>
           </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-white/5 bg-[#06090F] py-8 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="border-t hairline py-6">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[0.72rem] text-[#6d6450]">
           <div className="flex items-center gap-2">
-            <Clapperboard className="w-4 h-4 text-red-500" />
-            <span className="font-bold text-slate-400 font-cairo">شاهدت | Shahadt</span>
-            <span>—</span>
-            <span>تتبع الأفلام والمسلسلات</span>
+            <Clapperboard className="w-3.5 h-3.5 text-[#38301f]" />
+            <span className="text-[#948b76] font-semibold">{t.appTitle}</span>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span>البيانات من: توب سينما (Top Cinema) & أهواك تي في (Ahwak TV)</span>
-          </div>
+          <span>البيانات من: توب سينما & أهواك</span>
         </div>
       </footer>
 

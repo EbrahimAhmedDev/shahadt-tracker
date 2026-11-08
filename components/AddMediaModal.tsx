@@ -124,28 +124,28 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="relative w-full max-w-2xl max-h-[90vh] glass-panel rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col bg-[#0B101D]">
+      <div className="relative w-full max-w-2xl max-h-[90vh] panel rounded-2xl border border-[#38301f] shadow-2xl overflow-hidden flex flex-col bg-[#221d14]">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#38301f]">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-red-600/20 text-red-400 border border-red-500/30">
+            <div className="p-2 rounded-xl bg-[#f2b441]/20 text-[#f2b441] border border-[#f2b441]/30">
               <Sparkles className="w-4 h-4" />
             </div>
-            <h2 className="text-lg font-bold text-white">
+            <h2 className="text-lg font-bold text-[#f3ecdd]">
               {t.searchModalTitle}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-xl text-[#948b76] hover:text-[#f3ecdd] hover:bg-[#1b1710] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab switchers */}
-        <div className="flex items-center gap-2 px-6 pt-3 border-b border-white/5">
+        <div className="flex items-center gap-2 px-6 pt-3 border-b border-[#38301f]">
           <button
             onClick={() => {
               setActiveTab('search');
@@ -153,8 +153,8 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
             }}
             className={`pb-3 px-3 text-sm font-bold border-b-2 transition-all cursor-pointer ${
               activeTab === 'search'
-                ? 'border-red-500 text-red-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-[#f2b441] text-[#f2b441]'
+                : 'border-transparent text-[#948b76] hover:text-[#f3ecdd]'
             }`}
           >
             {t.searchButton} (توب سينما & أهواك)
@@ -166,8 +166,8 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
             }}
             className={`pb-3 px-3 text-sm font-bold border-b-2 transition-all cursor-pointer ${
               activeTab === 'manual'
-                ? 'border-red-500 text-red-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-[#f2b441] text-[#f2b441]'
+                : 'border-transparent text-[#948b76] hover:text-[#f3ecdd]'
             }`}
           >
             {t.addManual}
@@ -181,20 +181,20 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
               {/* Search Form */}
               <form onSubmit={handleSearch} className="flex gap-2">
                 <div className="relative flex-1">
-                  <Search className="w-4 h-4 absolute top-1/2 -translate-y-1/2 right-3.5 rtl:right-3.5 rtl:left-auto ltr:left-3.5 ltr:right-auto text-slate-500" />
+                  <Search className="w-4 h-4 absolute top-1/2 -translate-y-1/2 right-3.5 rtl:right-3.5 rtl:left-auto ltr:left-3.5 ltr:right-auto text-[#948b76]" />
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={t.searchPlaceholder}
                     autoFocus
-                    className="w-full bg-slate-900/90 text-sm text-white placeholder-slate-500 rounded-xl py-3 px-10 border border-white/10 focus:outline-none focus:border-red-500"
+                    className="w-full bg-[#1b1710] text-sm text-[#f3ecdd] placeholder-[#6d6450] rounded-xl py-3 px-10 border border-[#38301f] focus:outline-none focus:border-[#f2b441]"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={isSearching}
-                  className="px-5 py-3 rounded-xl text-sm font-bold bg-red-600 hover:bg-red-500 disabled:bg-slate-800 text-white transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-red-600/25"
+                  className="px-5 py-3 rounded-xl text-sm font-bold bg-[#f2b441] hover:bg-[#f2b441] disabled:bg-[#2a2317] text-[#12100c] transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-black/40"
                 >
                   {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : t.searchButton}
                 </button>
@@ -202,12 +202,12 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
 
               {/* Source Indicator */}
               {detectedSource !== 'none' && !isSearching && (
-                <div className="flex items-center gap-2 text-xs text-slate-400 px-1">
+                <div className="flex items-center gap-2 text-xs text-[#948b76] px-1">
                   <span>{t.source}:</span>
                   <span
                     className={`font-bold px-2 py-0.5 rounded-full ${
                       detectedSource === 'topcinema'
-                        ? 'bg-red-950 text-red-300 border border-red-500/40'
+                        ? 'bg-[#2a2317] text-[#f2b441] border border-[#f2b441]/40'
                         : 'bg-teal-950 text-teal-300 border border-teal-500/40'
                     }`}
                   >
@@ -219,15 +219,15 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
               {/* Loading indicator */}
               {isSearching && (
                 <div className="py-12 flex flex-col items-center justify-center text-center">
-                  <Loader2 className="w-8 h-8 text-red-500 animate-spin mb-3" />
-                  <p className="text-sm text-slate-400 font-medium">{t.searching}</p>
+                  <Loader2 className="w-8 h-8 text-[#c45050] animate-spin mb-3" />
+                  <p className="text-sm text-[#948b76] font-medium">{t.searching}</p>
                 </div>
               )}
 
               {/* Results Grid */}
               {!isSearching && !selectedResult && results.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-[#948b76]">
                     {t.searchResults} ({results.length})
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -235,9 +235,9 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                       <div
                         key={item.id}
                         onClick={() => setSelectedResult(item)}
-                        className="group relative glass-panel rounded-2xl overflow-hidden border border-white/5 hover:border-red-500/50 hover:shadow-xl hover:shadow-red-900/20 transition-all cursor-pointer flex flex-col"
+                        className="group relative panel rounded-2xl overflow-hidden border border-[#38301f] hover:border-[#f2b441]/50 hover:shadow-xl hover:20 transition-all cursor-pointer flex flex-col"
                       >
-                        <div className="aspect-[2/3] w-full bg-slate-900 overflow-hidden relative">
+                        <div className="aspect-[2/3] w-full bg-[#141109] overflow-hidden relative">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={item.posterUrl}
@@ -250,17 +250,17 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                           />
                           <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
                             <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-white font-bold flex items-center gap-1">
-                              {item.type === 'series' ? <Tv className="w-2.5 h-2.5 text-blue-400" /> : <Film className="w-2.5 h-2.5 text-rose-400" />}
+                              {item.type === 'series' ? <Tv className="w-2.5 h-2.5 text-[#9ecfff]" /> : <Film className="w-2.5 h-2.5 text-[#f2b441]" />}
                               {item.type === 'series' ? t.series : t.movie}
                             </span>
                           </div>
                         </div>
                         <div className="p-2.5">
-                          <p className="text-xs font-bold text-white line-clamp-2 leading-tight group-hover:text-red-400 transition-colors">
+                          <p className="text-xs font-bold text-[#f3ecdd] line-clamp-2 leading-tight group-hover:text-[#f2b441] transition-colors">
                             {item.title}
                           </p>
                           {item.year && (
-                            <span className="text-[10px] text-slate-400 mt-1 block">
+                            <span className="text-[10px] text-[#948b76] mt-1 block">
                               {item.year}
                             </span>
                           )}
@@ -273,15 +273,15 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
 
               {/* No results message */}
               {!isSearching && results.length === 0 && query && (
-                <div className="py-10 text-center glass-panel rounded-2xl p-6">
+                <div className="py-10 text-center panel rounded-2xl p-6">
                   <Film className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-                  <p className="text-sm text-slate-300 font-semibold mb-2">{t.noResults}</p>
+                  <p className="text-sm text-[#cfc4ab] font-semibold mb-2">{t.noResults}</p>
                   <button
                     onClick={() => {
                       setManualTitle(query);
                       setActiveTab('manual');
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white border border-white/10 transition-all cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-[#2a2317] hover:bg-[#2e281c] text-[#f3ecdd] border border-[#38301f] transition-all cursor-pointer"
                   >
                     + {t.addManual}
                   </button>
@@ -290,9 +290,9 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
 
               {/* Selected Result Configuration Panel */}
               {selectedResult && (
-                <div className="glass-panel p-5 rounded-2xl space-y-4 border border-red-500/30">
+                <div className="panel p-5 rounded-2xl space-y-4 border border-[#f2b441]/30">
                   <div className="flex gap-4">
-                    <div className="w-24 aspect-[2/3] rounded-xl overflow-hidden bg-slate-900 flex-shrink-0">
+                    <div className="w-24 aspect-[2/3] rounded-xl overflow-hidden bg-[#141109] flex-shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={selectedResult.posterUrl}
@@ -302,19 +302,19 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-red-600/20 text-red-400 border border-red-500/30">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-[#f2b441]/20 text-[#f2b441] border border-[#f2b441]/30">
                           {selectedResult.type === 'series' ? t.series : t.movie}
                         </span>
                         {selectedResult.year && (
-                          <span className="text-xs text-slate-400">{selectedResult.year}</span>
+                          <span className="text-xs text-[#948b76]">{selectedResult.year}</span>
                         )}
                       </div>
-                      <h4 className="text-base font-bold text-white mb-2">
+                      <h4 className="text-base font-bold text-[#f3ecdd] mb-2">
                         {selectedResult.title}
                       </h4>
                       <button
                         onClick={() => setSelectedResult(null)}
-                        className="text-xs text-red-400 hover:underline"
+                        className="text-xs text-[#f2b441] hover:underline"
                       >
                         ← اختيار عمل آخر
                       </button>
@@ -323,7 +323,7 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
 
                   {/* Status Picker */}
                   <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                    <label className="text-xs font-semibold text-[#948b76] block mb-1.5">
                       {t.selectStatus}
                     </label>
                     <div className="grid grid-cols-3 gap-2">
@@ -334,8 +334,8 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                           onClick={() => setWatchStatus(st)}
                           className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                             watchStatus === st
-                              ? 'bg-red-600 text-white border-red-500 shadow-lg shadow-red-600/30'
-                              : 'bg-slate-900/80 text-slate-300 border-white/5 hover:bg-slate-800'
+                              ? 'bg-[#f2b441] text-[#12100c] border-[#f2b441] '
+                              : 'bg-[#1b1710] text-[#cfc4ab] border-[#38301f] hover:bg-[#1b1710]'
                           }`}
                         >
                           {st === 'watching' ? t.watching : st === 'completed' ? t.completed : t.planToWatch}
@@ -348,7 +348,7 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                   {selectedResult.type === 'series' && (
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                        <label className="text-xs font-semibold text-[#948b76] block mb-1.5">
                           {t.currentEpisode}
                         </label>
                         <input
@@ -356,11 +356,11 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                           min="1"
                           value={currentEpisode}
                           onChange={(e) => setCurrentEpisode(parseInt(e.target.value) || 1)}
-                          className="w-full bg-slate-900 text-sm text-white rounded-xl p-2.5 border border-white/10"
+                          className="w-full bg-[#141109] text-sm text-[#f3ecdd] rounded-xl p-2.5 border border-[#38301f]"
                         />
                       </div>
                       <div>
-                        <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                        <label className="text-xs font-semibold text-[#948b76] block mb-1.5">
                           {t.totalEpisodes} (اختياري)
                         </label>
                         <input
@@ -369,7 +369,7 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                           placeholder="مثلاً 30"
                           value={totalEpisodes || ''}
                           onChange={(e) => setTotalEpisodes(e.target.value ? parseInt(e.target.value) : undefined)}
-                          className="w-full bg-slate-900 text-sm text-white rounded-xl p-2.5 border border-white/10"
+                          className="w-full bg-[#141109] text-sm text-[#f3ecdd] rounded-xl p-2.5 border border-[#38301f]"
                         />
                       </div>
                     </div>
@@ -378,9 +378,9 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                   {/* Rating Slider & Value */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-xs font-semibold text-slate-400">{t.rating}</label>
-                      <span className="text-sm font-black text-amber-400 flex items-center gap-1">
-                        <Star className="w-3.5 h-3.5 fill-amber-400" />
+                      <label className="text-xs font-semibold text-[#948b76]">{t.rating}</label>
+                      <span className="text-sm font-black text-[#f2b441] flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 fill-[#f2b441]" />
                         {rating.toFixed(1)} / 10
                       </span>
                     </div>
@@ -391,13 +391,13 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                       step="0.5"
                       value={rating}
                       onChange={(e) => setRating(parseFloat(e.target.value))}
-                      className="w-full accent-red-600 cursor-pointer"
+                      className="w-full accent-[#f2b441] cursor-pointer"
                     />
                   </div>
 
                   {/* Personal Notes */}
                   <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                    <label className="text-xs font-semibold text-[#948b76] block mb-1.5">
                       {t.notes}
                     </label>
                     <textarea
@@ -405,14 +405,14 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                       value={userNotes}
                       onChange={(e) => setUserNotes(e.target.value)}
                       placeholder={t.notesPlaceholder}
-                      className="w-full bg-slate-900 text-sm text-white rounded-xl p-2.5 border border-white/10 resize-none"
+                      className="w-full bg-[#141109] text-sm text-[#f3ecdd] rounded-xl p-2.5 border border-[#38301f] resize-none"
                     />
                   </div>
 
                   {/* Confirm Add Button */}
                   <button
                     onClick={handleAddSearchResult}
-                    className="w-full py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-xl shadow-red-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-3 rounded-xl text-sm font-bold bg-[#f2b441] hover:bg-[#ffd27a] text-white  transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     <Check className="w-4 h-4 stroke-[3]" />
                     <span>{t.addToTracker}</span>
@@ -424,7 +424,7 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
             /* Manual Entry Form */
             <form onSubmit={handleAddManual} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                <label className="text-xs font-semibold text-[#948b76] block mb-1.5">
                   {t.customTitle} *
                 </label>
                 <input
@@ -433,39 +433,39 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                   value={manualTitle}
                   onChange={(e) => setManualTitle(e.target.value)}
                   placeholder="مثال: فيلم Interstellar"
-                  className="w-full bg-slate-900 text-sm text-white rounded-xl p-3 border border-white/10 focus:border-red-500"
+                  className="w-full bg-[#141109] text-sm text-[#f3ecdd] rounded-xl p-3 border border-[#38301f] focus:border-[#f2b441]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                  <label className="text-xs font-semibold text-[#948b76] block mb-1.5">
                     {t.movie} / {t.series}
                   </label>
                   <select
                     value={manualType}
                     onChange={(e) => setManualType(e.target.value as MediaType)}
-                    className="w-full bg-slate-900 text-sm text-white rounded-xl p-3 border border-white/10"
+                    className="w-full bg-[#141109] text-sm text-[#f3ecdd] rounded-xl p-3 border border-[#38301f]"
                   >
                     <option value="movie">{t.movie}</option>
                     <option value="series">{t.series}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                  <label className="text-xs font-semibold text-[#948b76] block mb-1.5">
                     {t.year}
                   </label>
                   <input
                     type="number"
                     value={manualYear}
                     onChange={(e) => setManualYear(parseInt(e.target.value) || 2024)}
-                    className="w-full bg-slate-900 text-sm text-white rounded-xl p-3 border border-white/10"
+                    className="w-full bg-[#141109] text-sm text-[#f3ecdd] rounded-xl p-3 border border-[#38301f]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                <label className="text-xs font-semibold text-[#948b76] block mb-1.5">
                   {t.customPoster}
                 </label>
                 <input
@@ -473,12 +473,12 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                   value={manualPoster}
                   onChange={(e) => setManualPoster(e.target.value)}
                   placeholder="https://.../poster.jpg"
-                  className="w-full bg-slate-900 text-sm text-white rounded-xl p-3 border border-white/10"
+                  className="w-full bg-[#141109] text-sm text-[#f3ecdd] rounded-xl p-3 border border-[#38301f]"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                <label className="text-xs font-semibold text-[#948b76] block mb-1.5">
                   {t.story}
                 </label>
                 <textarea
@@ -486,13 +486,13 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                   value={manualOverview}
                   onChange={(e) => setManualOverview(e.target.value)}
                   placeholder="نبذة مختصرة عن العمل..."
-                  className="w-full bg-slate-900 text-sm text-white rounded-xl p-3 border border-white/10 resize-none"
+                  className="w-full bg-[#141109] text-sm text-[#f3ecdd] rounded-xl p-3 border border-[#38301f] resize-none"
                 />
               </div>
 
               {/* Status */}
               <div>
-                <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                <label className="text-xs font-semibold text-[#948b76] block mb-1.5">
                   {t.selectStatus}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -503,8 +503,8 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                       onClick={() => setWatchStatus(st)}
                       className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                         watchStatus === st
-                          ? 'bg-red-600 text-white border-red-500'
-                          : 'bg-slate-900 text-slate-300 border-white/5'
+                          ? 'bg-[#f2b441] text-[#12100c] border-[#f2b441]'
+                          : 'bg-[#141109] text-[#cfc4ab] border-[#38301f]'
                       }`}
                     >
                       {st === 'watching' ? t.watching : st === 'completed' ? t.completed : t.planToWatch}
@@ -515,7 +515,7 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl text-sm font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-xl shadow-red-600/30 transition-all cursor-pointer"
+                className="w-full py-3.5 rounded-xl text-sm font-bold bg-[#f2b441] hover:bg-[#ffd27a] text-white  transition-all cursor-pointer"
               >
                 + {t.addToTracker}
               </button>
