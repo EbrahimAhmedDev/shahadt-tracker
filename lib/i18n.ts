@@ -54,7 +54,12 @@ export type TranslationRecord = Record<
   | 'guestNotice'
   | 'confirmDelete'
   | 'congratsTitle'
-  | 'congratsDesc',
+  | 'congratsDesc'
+  | 'viewDetails'
+  | 'syncStatusCloud'
+  | 'syncStatusLocal'
+  | 'syncStatusError'
+  | 'syncStatusSyncing',
   string
 >;
 
@@ -114,6 +119,11 @@ export const translations: Record<Language, TranslationRecord> = {
     confirmDelete: 'هل أنت متأكد من حذف هذا العمل من قائمتك؟',
     congratsTitle: 'مبروك الانتهاء!',
     congratsDesc: 'أحسنت! أتممت مشاهدة العمل وتم نقله إلى قائمة "تمت المشاهدة".',
+    viewDetails: 'عرض التفاصيل',
+    syncStatusCloud: 'المزامنة السحابية',
+    syncStatusLocal: 'وضع محلي',
+    syncStatusError: 'مزامنة غير متاحة',
+    syncStatusSyncing: 'جاري المزامنة…',
   },
   en: {
     appTitle: 'Shahadt',
@@ -170,5 +180,10 @@ export const translations: Record<Language, TranslationRecord> = {
     confirmDelete: 'Are you sure you want to remove this item from your watchlist?',
     congratsTitle: 'Congratulations!',
     congratsDesc: 'You finished this title! Moved to your Completed list.',
+    viewDetails: 'View details',
+    syncStatusCloud: 'Cloud synced',
+    syncStatusLocal: 'Local mode',
+    syncStatusError: 'Sync unavailable',
+    syncStatusSyncing: 'Syncing…',
   },
 } as const;

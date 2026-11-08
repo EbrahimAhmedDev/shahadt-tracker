@@ -1,6 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { MediaItem, UserTracking, WatchStatus, MediaType } from '@/types/media';
 import { translations, Language, TranslationRecord } from '@/lib/i18n';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
@@ -11,6 +19,7 @@ interface TrackingContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: TranslationRecord;
+  syncStatus: SyncStatus;
   activeTab: WatchStatus | 'all';
   setActiveTab: (tab: WatchStatus | 'all') => void;
   filterType: 'all' | MediaType;
@@ -29,6 +38,8 @@ interface TrackingContextType {
     avgRating: string;
   };
 }
+
+export type SyncStatus = 'off' | 'local' | 'connecting' | 'synced' | 'error';
 
 const STORAGE_KEY = 'shahadt_tracker_items_v1';
 const LANG_STORAGE_KEY = 'shahadt_tracker_lang_v1';
@@ -83,6 +94,92 @@ const INITIAL_DEMO_ITEMS: UserTracking[] = [
 
 const TrackingContext = createContext<TrackingContextType | undefined>(undefined);
 
+/* ---------- Cloud sync helpers (Supabase) ---------- */
+
+type TrackingRow = {
+  id: string;
+  media_id: string;
+  status: string;
+  current_season: number | null;
+  current_episode: number | null;
+  total_episodes: number | null;
+  user_rating: number | null;
+  user_notes: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  updated_at: string | null;
+};
+
+type MediaRow = {
+  id: string;
+  title_ar: string;
+  title_en: string | null;
+  type: string;
+  poster_url: string | null;
+  overview: string | null;
+  release_year: number | null;
+  source: string;
+  source_url: string | null;
+  created_at: string | null;
+};
+
+function rowToItem(row: TrackingRow, media?: MediaRow | null): UserTracking | null {
+  if (!media) return null;
+  return {
+    id: row.id,
+    remoteId: row.id,
+    remoteMediaId: media.id,
+    mediaId: media.id,
+    status: row.status as WatchStatus,
+    currentSeason: row.current_season ?? 1,
+    currentEpisode: row.current_episode ?? 0,
+    totalEpisodes: row.total_episodes ?? undefined,
+    userRating: row.user_rating ?? undefined,
+    userNotes: row.user_notes ?? undefined,
+    startedAt: row.started_at ?? undefined,
+    completedAt: row.completed_at ?? undefined,
+    updatedAt: row.updated_at ?? new Date().toISOString(),
+    media: {
+      id: media.id,
+      titleAr: media.title_ar,
+      titleEn: media.title_en ?? undefined,
+      type: media.type as MediaType,
+      posterUrl: media.poster_url ?? '',
+      overview: media.overview ?? undefined,
+      releaseYear: media.release_year ?? undefined,
+      source: media.source as MediaItem['source'],
+      sourceUrl: media.source_url ?? undefined,
+      createdAt: media.created_at ?? undefined,
+    },
+  };
+}
+
+function trackingPayload(item: UserTracking) {
+  return {
+    status: item.status,
+    current_season: item.currentSeason ?? 1,
+    current_episode: item.currentEpisode ?? 0,
+    total_episodes: item.totalEpisodes ?? null,
+    user_rating: item.userRating ?? null,
+    user_notes: item.userNotes || null,
+    completed_at: item.completedAt || null,
+  };
+}
+
+function mediaPayload(media: MediaItem) {
+  return {
+    title_ar: media.titleAr,
+    title_en: media.titleEn || null,
+    type: media.type,
+    poster_url: media.posterUrl || null,
+    overview: media.overview || null,
+    release_year: media.releaseYear ?? null,
+    genres: media.genres ?? null,
+    source: media.source,
+    source_url: media.sourceUrl || null,
+  };
+}
+
 export function TrackingProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('ar');
   const [items, setItems] = useState<UserTracking[]>([]);
@@ -90,56 +187,237 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   const [filterType, setFilterType] = useState<'all' | MediaType>('all');
   const [searchFilter, setSearchFilter] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('local');
 
-  // Initialize language and items from localStorage
-  useEffect(() => {
-    try {
-      const savedLang = localStorage.getItem(LANG_STORAGE_KEY) as Language;
-      if (savedLang === 'ar' || savedLang === 'en') {
-        setLanguageState(savedLang);
-        document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
-        document.documentElement.lang = savedLang;
-      } else {
-        document.documentElement.dir = 'rtl';
-        document.documentElement.lang = 'ar';
-      }
+  // Keep a ref of items for async sync functions to read the latest version.
+  const itemsRef = useRef<UserTracking[]>([]);
+  const updateItemRefs = useRef<(id: string, patch: Partial<UserTracking>) => void>(() => {});
 
-      const savedData = localStorage.getItem(STORAGE_KEY);
-      if (savedData) {
-        setItems(JSON.parse(savedData));
-      } else {
-        setItems(INITIAL_DEMO_ITEMS);
-      }
-    } catch (e) {
-      console.error('Error loading stored items:', e);
-      setItems(INITIAL_DEMO_ITEMS);
-    } finally {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  // Save items to localStorage whenever updated
-  useEffect(() => {
-    if (!isLoaded) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch (e) {
-      console.error('Error saving items to localStorage:', e);
-    }
-  }, [items, isLoaded]);
-
+  /* ---------- Language ---------- */
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     try {
       localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch {}
+    if (typeof document !== 'undefined') {
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
       document.documentElement.lang = lang;
-    } catch (e) {
-      console.error('Error saving lang:', e);
     }
   };
 
   const t = translations[language];
+
+  const triggerConfetti = () => {
+    try {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#E50914', '#FFB800', '#FFFFFF', '#38BDF8'],
+      });
+    } catch {}
+  };
+
+  /* ---------- Cloud sync ---------- */
+
+  const pushItem = useCallback(async (item: UserTracking) => {
+    if (!isSupabaseConfigured || !supabase) return false;
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData?.session?.user?.id;
+      if (!userId) return false;
+
+      // 1) Resolve the media row.
+      let mediaDbId = item.remoteMediaId ?? null;
+      if (!mediaDbId) {
+        if (item.media?.sourceUrl) {
+          const { data: existing } = await supabase
+            .from('media_items')
+            .select('id')
+            .eq('source_url', item.media.sourceUrl)
+            .limit(1);
+          if (existing && existing[0]) mediaDbId = existing[0].id;
+        }
+        if (!mediaDbId && item.media) {
+          const { data: inserted, error } = await supabase
+            .from('media_items')
+            .insert(mediaPayload(item.media))
+            .select('id');
+          if (error) throw error;
+          if (inserted && inserted[0]) mediaDbId = inserted[0].id;
+        }
+      }
+      if (!mediaDbId) return false;
+
+      // 2) Upsert the tracking row.
+      let trackingDbId = item.remoteId ?? null;
+      const payload = { ...trackingPayload(item), media_id: mediaDbId, user_id: userId };
+
+      if (trackingDbId) {
+        const { error } = await supabase
+          .from('user_tracking')
+          .update(trackingPayload(item))
+          .eq('id', trackingDbId);
+        if (error) throw error;
+      } else {
+        const { data: insertedRows, error } = await supabase
+          .from('user_tracking')
+          .insert(payload)
+          .select('id');
+        if (error) {
+          // The row may exist (unique user_id+media_id) — try to find it.
+          const { data: found } = await supabase
+            .from('user_tracking')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('media_id', mediaDbId)
+            .limit(1);
+          if (found && found[0]) trackingDbId = found[0].id;
+          else throw error;
+        } else if (insertedRows && insertedRows[0]) {
+          trackingDbId = insertedRows[0].id;
+        }
+      }
+      if (!trackingDbId) return false;
+
+      updateItemRefs.current(item.id, {
+        remoteId: trackingDbId,
+        remoteMediaId: mediaDbId,
+      });
+      return true;
+    } catch (err) {
+      console.error('Supabase sync error (pushItem):', err);
+      setSyncStatus('error');
+      return false;
+    }
+  }, []);
+
+  const remoteRemove = useCallback(async (item: UserTracking) => {
+    if (!isSupabaseConfigured || !supabase || !item.remoteId) return;
+    try {
+      await supabase.from('user_tracking').delete().eq('id', item.remoteId);
+    } catch (err) {
+      console.error('Supabase sync error (remove):', err);
+    }
+  }, []);
+
+  /* ---------- Local helpers ---------- */
+
+  const applyItemUpdate = useCallback((id: string, patch: Partial<UserTracking>) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              ...patch,
+              updatedAt: new Date().toISOString(),
+            }
+          : item
+      )
+    );
+  }, []);
+
+  useEffect(() => {
+    updateItemRefs.current = (id, patch) => {
+      applyItemUpdate(id, patch);
+    };
+  }, [applyItemUpdate]);
+
+  // Persist to localStorage
+  useEffect(() => {
+    itemsRef.current = items;
+    if (!isLoaded) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {}
+  }, [items, isLoaded]);
+
+  /* ---------- Startup: local load + cloud restore ---------- */
+  useEffect(() => {
+    const init = async () => {
+      // 1) Language
+      try {
+        const savedLang = localStorage.getItem(LANG_STORAGE_KEY) as Language;
+        if (savedLang === 'ar' || savedLang === 'en') {
+          setLanguageState(savedLang);
+        }
+      } catch {}
+
+      // 2) Local items
+      setItems(INITIAL_DEMO_ITEMS);
+      try {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+          setItems(JSON.parse(savedData));
+        }
+      } catch (e) {
+        console.error('Error loading stored items:', e);
+      }
+      setIsLoaded(true);
+
+      // 3) Cloud restore
+      if (!isSupabaseConfigured || !supabase) {
+        setSyncStatus('local');
+        return;
+      }
+
+      setSyncStatus('connecting');
+      try {
+        // Ensure we have a session (anonymous sign-in) — falls back to local mode
+        // if anonymous users are disabled for the project.
+        let { data } = await supabase.auth.getSession();
+        if (!data?.session) {
+          const { data: anonData, error: anonError } = await supabase.auth.signInAnonymously();
+          if (anonError || !anonData?.session) {
+            console.warn('Anonymous sign-in unavailable, running local-only.', anonError);
+            setSyncStatus('local');
+            return;
+          }
+          data = { session: anonData.session };
+        }
+
+        const { data: rows, error: rowsError } = await supabase
+          .from('user_tracking')
+          .select(
+            'id, media_id, status, current_season, current_episode, total_episodes, user_rating, user_notes, started_at, completed_at, updated_at, media_items(*)'
+          );
+        if (rowsError) throw rowsError;
+
+        const localItems = (JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') ||
+          INITIAL_DEMO_ITEMS) as UserTracking[];
+        const serverItems = (rows || [])
+          .map((row: { [key: string]: unknown }) => {
+            const { media_items, ...rest } = row;
+            return rowToItem(rest as TrackingRow, (media_items as MediaRow) || null);
+          })
+          .filter(Boolean) as UserTracking[];
+
+        if (serverItems.length > 0) {
+          // Cloud is the source of truth after first sync.
+          setItems(serverItems);
+        } else {
+          setItems(localItems);
+          // First sync — push any real (non-demo) local items to the cloud.
+          const realLocal = localItems.filter((i) => !i.id.startsWith('demo-'));
+          if (realLocal.length > 0) {
+            setSyncStatus('synced');
+            for (const item of realLocal) {
+              await pushItem(item);
+            }
+          }
+        }
+        setSyncStatus('synced');
+      } catch (err) {
+        console.error('Supabase restore error:', err);
+        setSyncStatus('error');
+      }
+    };
+
+    init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* ---------- Mutations ---------- */
 
   const addMedia = (mediaData: Omit<MediaItem, 'id'>, initialTracking: Partial<UserTracking>) => {
     const mediaId = `media-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
@@ -156,7 +434,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
       mediaId: mediaId,
       status: initialTracking.status || 'watching',
       currentSeason: initialTracking.currentSeason || 1,
-      currentEpisode: initialTracking.currentEpisode || (newMedia.type === 'movie' ? 1 : 1),
+      currentEpisode: initialTracking.currentEpisode || 1,
       totalEpisodes: initialTracking.totalEpisodes,
       totalSeasons: initialTracking.totalSeasons,
       userRating: initialTracking.userRating,
@@ -168,56 +446,44 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
 
     setItems((prev) => [newTracking, ...prev]);
 
-    // If Supabase is configured, sync to database
-    if (isSupabaseConfigured && supabase) {
-      const client = supabase;
-      (async () => {
-        try {
-          const { data } = await client
-            .from('media_items')
-            .insert({
-              title_ar: newMedia.titleAr,
-              title_en: newMedia.titleEn,
-              type: newMedia.type,
-              poster_url: newMedia.posterUrl,
-              overview: newMedia.overview,
-              release_year: newMedia.releaseYear,
-              source: newMedia.source,
-              source_url: newMedia.sourceUrl,
-            })
-            .select();
-
-          if (data && data[0]) {
-            await client.from('user_tracking').insert({
-              media_id: data[0].id,
-              status: newTracking.status,
-              current_season: newTracking.currentSeason,
-              current_episode: newTracking.currentEpisode,
-              total_episodes: newTracking.totalEpisodes,
-              user_rating: newTracking.userRating,
-              user_notes: newTracking.userNotes,
-            });
-          }
-        } catch (err) {
-          console.error('Supabase sync error:', err);
-        }
-      })();
+    if (syncStatus !== 'error' && supabase) {
+      pushItem(newTracking);
     }
   };
 
   const updateTracking = (id: string, updates: Partial<UserTracking>) => {
     setItems((prev) =>
       prev.map((item) => {
-        if (item.id === id) {
-          const updated = {
-            ...item,
-            ...updates,
-            updatedAt: new Date().toISOString(),
-            media: updates.media ? { ...item.media!, ...updates.media } : item.media,
-          };
-          return updated;
+        if (item.id !== id) return item;
+        const updated: UserTracking = {
+          ...item,
+          ...updates,
+          updatedAt: new Date().toISOString(),
+          media: updates.media ? { ...item.media!, ...updates.media } : item.media,
+        };
+        if (supabase && (updated.remoteId || updated.remoteMediaId)) {
+          // Sync in the background; local state is already applied.
+          (async () => {
+            if (!updated.remoteId && updated.remoteMediaId) {
+              // Row known remotely as unsaved? Try a full push first.
+              const ok = await pushItem(updated);
+              if (!ok) return;
+            } else {
+              try {
+                const { error } = await supabase!
+                  .from('user_tracking')
+                  .update(trackingPayload(updated));
+                if (error) {
+                  // Row might not exist remotely (e.g. added while offline) — full push.
+                  await pushItem(updated);
+                }
+              } catch {
+                await pushItem(updated);
+              }
+            }
+          })();
         }
-        return item;
+        return updated;
       })
     );
   };
@@ -225,54 +491,64 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   const incrementEpisode = (id: string) => {
     setItems((prev) =>
       prev.map((item) => {
-        if (item.id === id) {
-          const nextEp = (item.currentEpisode || 0) + 1;
-          const isFinished = item.totalEpisodes && nextEp >= item.totalEpisodes;
-          if (isFinished) {
-            triggerConfetti();
-          }
-          return {
-            ...item,
-            currentEpisode: nextEp,
-            status: isFinished ? 'completed' : item.status,
-            completedAt: isFinished ? new Date().toISOString() : item.completedAt,
-            updatedAt: new Date().toISOString(),
-          };
+        if (item.id !== id) return item;
+        const nextEp = (item.currentEpisode || 0) + 1;
+        const isFinished = !!item.totalEpisodes && nextEp >= item.totalEpisodes;
+        const updated: UserTracking = {
+          ...item,
+          currentEpisode: nextEp,
+          status: isFinished ? 'completed' : item.status,
+          completedAt: isFinished ? new Date().toISOString() : item.completedAt,
+          updatedAt: new Date().toISOString(),
+        };
+        if (supabase && updated.remoteId) {
+          (async () => {
+            try {
+              const { error } = await supabase!
+                .from('user_tracking')
+                .update(trackingPayload(updated));
+              if (error) await pushItem(updated);
+            } catch {
+              await pushItem(updated);
+            }
+          })();
         }
-        return item;
+        return updated;
       })
     );
-  };
-
-  const triggerConfetti = () => {
-    try {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#E50914', '#FFB800', '#FFFFFF', '#38BDF8'],
-      });
-    } catch {}
   };
 
   const markCompleted = (id: string) => {
     triggerConfetti();
     setItems((prev) =>
       prev.map((item) => {
-        if (item.id === id) {
-          return {
-            ...item,
-            status: 'completed',
-            completedAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
+        if (item.id !== id) return item;
+        const updated: UserTracking = {
+          ...item,
+          status: 'completed',
+          completedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        if (supabase && updated.remoteId) {
+          (async () => {
+            try {
+              const { error } = await supabase!
+                .from('user_tracking')
+                .update(trackingPayload(updated));
+              if (error) await pushItem(updated);
+            } catch {
+              await pushItem(updated);
+            }
+          })();
         }
-        return item;
+        return updated;
       })
     );
   };
 
   const removeTracking = (id: string) => {
+    const target = itemsRef.current.find((i) => i.id === id);
+    if (target) remoteRemove(target);
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
@@ -309,6 +585,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
         language,
         setLanguage,
         t,
+        syncStatus,
         activeTab,
         setActiveTab,
         filterType,

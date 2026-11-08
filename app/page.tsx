@@ -102,7 +102,7 @@ export default function Home() {
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-950 hover:bg-slate-200 shadow-xl transition-all hover:scale-105 active:scale-95 cursor-pointer"
                   >
                     <Play className="w-4 h-4 fill-slate-950" />
-                    <span>متابعة التفاصيل</span>
+                    <span>{t.viewDetails}</span>
                   </button>
                   <button
                     onClick={() => setIsAddModalOpen(true)}
@@ -115,17 +115,19 @@ export default function Home() {
               </div>
 
               {/* Poster Thumbnail */}
-              <div
-                onClick={() => setSelectedItem(featuredItem)}
-                className="hidden md:block w-36 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 flex-shrink-0 cursor-pointer hover:scale-105 transition-transform"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={featuredItem.media.posterUrl}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              {featuredItem.media.posterUrl && (
+                <div
+                  onClick={() => setSelectedItem(featuredItem)}
+                  className="hidden md:block w-36 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 flex-shrink-0 cursor-pointer hover:scale-105 transition-transform"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={featuredItem.media.posterUrl}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -190,6 +192,7 @@ export default function Home() {
       />
 
       <MediaDetailModal
+        key={selectedItem?.id ?? 'none'}
         item={selectedItem}
         onClose={() => setSelectedItem(null)}
       />

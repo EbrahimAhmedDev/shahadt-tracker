@@ -1,17 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Star,
   Film,
   Tv,
-  CheckCircle,
   Trash2,
   ExternalLink,
   Save,
-  Clock,
-  Sparkles,
 } from 'lucide-react';
 import { UserTracking, WatchStatus } from '@/types/media';
 import { useTracking } from '@/lib/store/tracking-context';
@@ -24,23 +21,12 @@ interface MediaDetailModalProps {
 export const MediaDetailModal: React.FC<MediaDetailModalProps> = ({ item, onClose }) => {
   const { updateTracking, removeTracking, t, language } = useTracking();
 
-  const [status, setStatus] = useState<WatchStatus>('watching');
-  const [currentSeason, setCurrentSeason] = useState<number>(1);
-  const [currentEpisode, setCurrentEpisode] = useState<number>(1);
-  const [totalEpisodes, setTotalEpisodes] = useState<number | undefined>(undefined);
-  const [rating, setRating] = useState<number>(0);
-  const [notes, setNotes] = useState<string>('');
-
-  useEffect(() => {
-    if (item) {
-      setStatus(item.status);
-      setCurrentSeason(item.currentSeason || 1);
-      setCurrentEpisode(item.currentEpisode || 1);
-      setTotalEpisodes(item.totalEpisodes);
-      setRating(item.userRating || 0);
-      setNotes(item.userNotes || '');
-    }
-  }, [item]);
+  const [status, setStatus] = useState<WatchStatus>(item?.status ?? 'watching');
+  const [currentSeason, setCurrentSeason] = useState<number>(item?.currentSeason ?? 1);
+  const [currentEpisode, setCurrentEpisode] = useState<number>(item?.currentEpisode ?? 1);
+  const [totalEpisodes, setTotalEpisodes] = useState<number | undefined>(item?.totalEpisodes);
+  const [rating, setRating] = useState<number>(item?.userRating ?? 0);
+  const [notes, setNotes] = useState<string>(item?.userNotes ?? '');
 
   if (!item || !item.media) return null;
 

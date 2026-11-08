@@ -1,20 +1,27 @@
 'use client';
 
 import React from 'react';
-import { Film, Plus, Globe, Clapperboard, Sparkles, Database } from 'lucide-react';
+import { Plus, Globe, Clapperboard } from 'lucide-react';
 import { useTracking } from '@/lib/store/tracking-context';
-import { isSupabaseConfigured } from '@/lib/supabase/client';
 
 interface NavbarProps {
   onOpenAddModal: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenAddModal }) => {
-  const { language, setLanguage, t, searchFilter, setSearchFilter } = useTracking();
+  const { language, setLanguage, t, searchFilter, setSearchFilter, syncStatus } = useTracking();
 
   const toggleLanguage = () => {
     setLanguage(language === 'ar' ? 'en' : 'ar');
   };
+
+  const syncMeta = {
+    synced: { label: t.syncStatusCloud, dot: 'bg-emerald-400', text: 'text-emerald-400' },
+    connecting: { label: t.syncStatusSyncing, dot: 'bg-amber-400 animate-pulse', text: 'text-amber-400' },
+    local: { label: t.syncStatusLocal, dot: 'bg-slate-400', text: 'text-slate-300' },
+    error: { label: t.syncStatusError, dot: 'bg-rose-400', text: 'text-rose-400' },
+    off: { label: t.syncStatusLocal, dot: 'bg-slate-400', text: 'text-slate-300' },
+  }[syncStatus];
 
   return (
     <header className="sticky top-0 z-40 w-full glass-panel border-b border-white/10 backdrop-blur-md">
@@ -65,13 +72,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAddModal }) => {
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
             
-            {/* Supabase / Local status pill */}
+            {/* Live sync status pill */}
             <div
-              title={isSupabaseConfigured ? 'Supabase Connected' : t.guestNotice}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-900/70 border border-white/5 text-slate-300"
+              title={syncStatus === 'synced' ? t.syncStatusCloud : t.guestNotice}
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-900/70 border border-white/5 text-slate-300"
+              aria-live="polite"
             >
-              <Database className={`w-3.5 h-3.5 ${isSupabaseConfigured ? 'text-emerald-400' : 'text-amber-400'}`} />
-              <span>{isSupabaseConfigured ? 'Supabase Cloud' : t.guestMode}</span>
+              <span className={`w-1.5 h-1.5 rounded-full ${syncMeta.dot}`} aria-hidden />
+              <span>{syncMeta.label}</span>
             </div>
 
             {/* Language Switcher */}

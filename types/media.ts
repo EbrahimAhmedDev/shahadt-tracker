@@ -19,6 +19,8 @@ export interface MediaItem {
 export interface UserTracking {
   id: string;
   userId?: string;
+  remoteId?: string; // Supabase user_tracking.id when synced
+  remoteMediaId?: string; // Supabase media_items.id when synced
   mediaId: string;
   status: WatchStatus;
   currentSeason: number;

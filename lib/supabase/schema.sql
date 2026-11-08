@@ -52,7 +52,21 @@ create table if not exists public.user_tracking (
 
 -- Indexes for fast querying
 create index if not exists idx_user_tracking_user_status on public.user_tracking(user_id, status);
+create index if not exists idx_user_tracking_media_id on public.user_tracking(media_id);
 create index if not exists idx_media_items_title_ar on public.media_items using gin (to_tsvector('arabic', title_ar));
+
+-- Auto-update updated_at on user_tracking
+create extension if not exists moddatetime with schema extensions;
+
+drop trigger if exists handle_updated_at on public.user_tracking;
+create trigger handle_updated_at
+before update on public.user_tracking
+for each row execute procedure extensions.moddatetime(updated_at);
+
+-- Deduplicate media items by source_url
+create unique index if not exists media_items_source_url_key
+  on public.media_items (source_url)
+  where source_url is not null and source_url <> '';
 
 -- Enable RLS for user_tracking
 alter table public.user_tracking enable row level security;
