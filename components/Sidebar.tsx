@@ -23,8 +23,9 @@ const STATUS_ITEMS: { status: WatchStatus; icon: React.ElementType; color: strin
 
 /** CSS pixel-art scene: couch + TV + plant (decorative) */
 function PixelScene() {
+  let px = 0;
   const P = (x: number, y: number, c: string, w = 1, h = 1) => (
-    <span key={`${x}-${y}`} style={{ position: 'absolute', left: x * 6, top: y * 6, width: w * 6, height: h * 6, background: c }} />
+    <span key={px++} style={{ position: 'absolute', left: x * 6, top: y * 6, width: w * 6, height: h * 6, background: c }} />
   );
   return (
     <div className="relative opacity-90 pointer-events-none" style={{ width: 168, height: 84 }} aria-hidden>
