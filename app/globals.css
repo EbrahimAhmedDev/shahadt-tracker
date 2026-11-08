@@ -1,132 +1,246 @@
 @import "tailwindcss";
 
 /* ============================================================
-   شاهدت — "دارك روم" هوية بصرية
-   الفكرة: ضوء البروجكتور في قاعة معتمة، ورق بسمار، خيوط عنبر دافئة.
-   No neon red. No glass blur spam. One accent, spent carefully.
+   شاهدت — Design System
+   Direction: quiet media dashboard. Charcoal neutral, ONE red,
+   readable type, generous spacing, zero gimmicks.
    ============================================================ */
 
 :root {
-  --s-dark: #12100c;      /* قاع القاعة */
-  --s-raised: #1b1710;    /* لوح مرفوع */
-  --s-panel: #221d14;     /* ألواح الترحيب */
-  --s-line: #38301f;      /* خطوط بنية خفيفة */
-  --s-ivory: #f3ecdd;     /* نص أساسي */
-  --s-ivory-dim: #cfc4ab; /* نص ثانوي */
-  --s-muted: #948b76;     /* نص خامل */
-  --s-amber: #f2b441;     /* ضوء البروجكتور — الأكسنت الوحيد */
-  --s-amber-deep: #a97f1f;
-  --s-danger: #c45050;    /* حذف فقط */
-  --s-green: #7ba05a;     /* إتمام فقط */
-  --border-subtle: rgba(243, 236, 221, 0.08);
+  /* Foundation */
+  --bg: #0f1115;            /* app background — neutral charcoal */
+  --bg-elevated: #16181d;   /* cards, header */
+  --bg-raised: #1d2027;     /* hover surface, modal */
+  --bg-input: #121419;      /* inputs */
+  --stroke: #26292f;         /* 1px borders everywhere */
+  --stroke-strong: #33373f;
+
+  /* Text */
+  --text-hi: #f4f5f6;
+  --text-mid: #aab0ba;
+  --text-low: #6b7280;
+
+  /* Accent — the only color that, well, acc(e)nts */
+  --accent: #e5484d;
+  --accent-hover: #f05e63;
+  --accent-ink: #ffffff;    /* text on accent */
+
+  /* Semantic */
+  --ok: #46a758;
+  --warn: #f2b441;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--s-dark);
-  color: var(--s-ivory);
+  background: var(--bg);
+  color: var(--text-hi);
   min-height: 100vh;
   overflow-x: hidden;
-  font-family: var(--font-plex-ar), var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
-  font-feature-settings: "kern";
+  font-family: var(--font-plex-ar), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* ---------- Focus ring (aluminum) ---------- */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--s-amber);
+.nums { font-family: var(--font-grotesk), var(--font-plex-ar), sans-serif; font-variant-numeric: tabular-nums; }
+
+::selection { background: var(--accent); color: #fff; }
+
+/* Focus */
+:where(a, button, input, select, textarea, [role="tab"]):focus-visible {
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 2px;
 }
 
-::selection {
-  background: var(--s-amber);
-  color: var(--s-dark);
-}
-
-/* ---------- Scrollbar: dim strip ---------- */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--s-dark); }
-::-webkit-scrollbar-thumb { background: #2e281c; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--s-amber-deep); }
-
-/* ---------- Shared primitives ---------- */
-/* لوح فاتح مرفوع بأخاديد الفيلم — بدل الزجاج */
-.panel {
-  background: var(--s-raised);
-  border: 1px solid var(--s-line);
-  border-radius: 14px;
-}
-
-.panel-hover {
-  transition: border-color 0.25s ease, transform 0.25s ease;
-}
-.panel-hover:hover {
-  border-color: rgba(242, 180, 65, 0.45);
-}
-
-/* زر رئيسي: عنبري صلب، بلا توهج */
-.btn-solid {
-  background: var(--s-amber);
-  color: var(--s-dark);
-  border-radius: 10px;
-  font-weight: 700;
-  transition: filter 0.15s ease, transform 0.15s ease;
-}
-.btn-solid:hover { filter: brightness(1.08); }
-.btn-solid:active { transform: scale(0.97); }
-
-.btn-ghost {
-  background: transparent;
-  color: var(--s-ivory-dim);
-  border: 1px solid var(--s-line);
-  border-radius: 10px;
-  font-weight: 600;
-  transition: border-color 0.15s ease, color 0.15s ease;
-}
-.btn-ghost:hover { border-color: var(--s-amber-deep); color: var(--s-ivory); }
-
-/* حقل إدخال */
-.field {
-  background: #0d0b08;
-  border: 1px solid var(--s-line);
-  border-radius: 10px;
-  color: var(--s-ivory);
-  transition: border-color 0.15s ease;
-}
-.field:focus { border-color: var(--s-amber-deep); outline: none; }
-.field::placeholder { color: var(--s-muted); }
-
-/* معدّة المودال */
-.modal-surface {
-  background: var(--s-panel);
-  border: 1px solid var(--s-line);
-  border-radius: 18px;
-}
-
-/* خط عنوان صغير */
-.eyebrow {
-  color: var(--s-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-/* شريط شعرة أفقي */
-.hairline { border-color: var(--s-line); }
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #26292f; border-radius: 8px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: #33373f; }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar { scrollbar-width: none; }
 
-/* ---------- Reduced motion ---------- */
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 8px 16px;
+  background: var(--bg-raised);
+  color: var(--text-hi);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-sm);
+  font-size: 0.875rem; font-weight: 600; line-height: 1.4;
+  cursor: pointer; white-space: nowrap;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.btn:hover { background: #23262d; border-color: var(--stroke-strong); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+.btn-primary {
+  background: var(--accent); border-color: transparent; color: var(--accent-ink);
+}
+.btn-primary:hover { background: var(--accent-hover); border-color: transparent; }
+
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text-mid); }
+.btn-ghost:hover { background: var(--bg-raised); color: var(--text-hi); }
+
+.btn-icon { padding: 8px; }
+.btn-sm { padding: 6px 12px; font-size: 0.8125rem; }
+.btn-lg { padding: 11px 22px; font-size: 0.9375rem; border-radius: var(--r-md); }
+
+/* ============================================================
+   Inputs
+   ============================================================ */
+.input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-sm);
+  color: var(--text-hi);
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  transition: border-color .15s, background .15s;
+}
+.input::placeholder { color: var(--text-low); }
+.input:focus { outline: none; border-color: #4a505c; background: var(--bg-raised); }
+
+.input-search { padding-inline-start: 38px; padding-inline-end: 34px; }
+
+/* ============================================================
+   Chips & badges
+   ============================================================ */
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 999px;
+  font-size: 0.75rem; font-weight: 600; line-height: 1.5;
+  background: var(--bg-raised); border: 1px solid var(--stroke);
+  color: var(--text-mid);
+}
+
+.status-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 999px;
+  font-size: 0.7rem; font-weight: 700;
+  backdrop-filter: blur(6px);
+}
+.status-watching { background: rgba(229,72,77,.15); color: #ff8a8d; border: 1px solid rgba(229,72,77,.35); }
+.status-completed { background: rgba(70,167,88,.15); color: #6fd37f; border: 1px solid rgba(70,167,88,.35); }
+.status-plan { background: rgba(242,180,65,.15); color: #f7c96b; border: 1px solid rgba(242,180,65,.35); }
+.status-dropped { background: rgba(150,156,168,.12); color: #a7adb8; border: 1px solid rgba(150,156,168,.3); }
+
+/* ============================================================
+   Card
+   ============================================================ */
+.media-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+.media-card:hover {
+  border-color: #3b4049;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -8px rgba(0,0,0,.55);
+}
+
+.progress-track { height: 4px; border-radius: 999px; background: #23262d; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width .3s ease; }
+
+/* ============================================================
+   Tabs (segmented)
+   ============================================================ */
+.tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 999px;
+  font-size: 0.8125rem; font-weight: 600;
+  color: var(--text-mid); background: transparent;
+  cursor: pointer; white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.tab:hover { color: var(--text-hi); background: var(--bg-elevated); }
+.tab[data-active="true"] { background: var(--text-hi); color: #14161a; }
+.tab .tab-count { font-family: var(--font-grotesk), sans-serif; font-size: 0.68rem; opacity: .75; }
+.tab[data-active="true"] .tab-count { opacity: .9; }
+
+.seg {
+  display: inline-flex; padding: 3px; gap: 2px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+}
+.seg-item {
+  padding: 5px 12px; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--text-low); cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.seg-item:hover { color: var(--text-mid); }
+.seg-item[data-active="true"] { background: var(--bg-raised); color: var(--text-hi); }
+
+/* ============================================================
+   Modal
+   ============================================================ */
+.overlay {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  background: rgba(6,7,9,.75);
+  backdrop-filter: blur(8px);
+}
+.modal {
+  position: relative; width: 100%; max-width: 560px;
+  max-height: 90vh; display: flex; flex-direction: column;
+  background: var(--bg-raised);
+  border: 1px solid var(--stroke-strong);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 24px 64px -16px rgba(0,0,0,.8);
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--stroke);
+  background: var(--bg-elevated);
+}
+.modal-body { padding: 20px; overflow-y: auto; }
+.modal-foot {
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--stroke);
+  background: var(--bg-elevated);
+}
+
+/* Sections inside modals */
+.section {
+  background: var(--bg-elevated);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-md);
+  padding: 16px;
+}
+.section-label { font-size: 0.78rem; font-weight: 600; color: var(--text-mid); margin-bottom: 10px; }
+
+/* Star rating display */
+.star-row { display: flex; gap: 4px; }
+
+/* Empty state */
+.empty {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 56px 24px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: .01ms !important;
   }
 }

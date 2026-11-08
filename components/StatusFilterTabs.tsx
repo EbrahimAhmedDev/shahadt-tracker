@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { PlayCircle, CheckCircle2, Bookmark, XCircle, LayoutGrid, Film, Tv } from 'lucide-react';
 import { useTracking } from '@/lib/store/tracking-context';
 import { WatchStatus, MediaType } from '@/types/media';
 
@@ -12,70 +13,61 @@ export const StatusFilterTabs: React.FC = () => {
     return items.filter((i) => i.status === status).length;
   };
 
-  const tabs: { id: WatchStatus | 'all'; label: string }[] = [
-    { id: 'watching', label: t.watching },
-    { id: 'completed', label: t.completed },
-    { id: 'plan_to_watch', label: t.planToWatch },
-    { id: 'dropped', label: t.dropped },
-    { id: 'all', label: t.all },
+  const tabs: { id: WatchStatus | 'all'; label: string; icon: React.ElementType }[] = [
+    { id: 'watching', label: t.watching, icon: PlayCircle },
+    { id: 'completed', label: t.completed, icon: CheckCircle2 },
+    { id: 'plan_to_watch', label: t.planToWatch, icon: Bookmark },
+    { id: 'dropped', label: t.dropped, icon: XCircle },
+    { id: 'all', label: t.all, icon: LayoutGrid },
   ];
 
-  const types: { id: 'all' | MediaType; label: string }[] = [
-    { id: 'all', label: t.all },
-    { id: 'movie', label: t.movie },
-    { id: 'series', label: t.series },
+  const types: { id: 'all' | MediaType; label: string; icon: React.ElementType }[] = [
+    { id: 'all', label: t.all, icon: LayoutGrid },
+    { id: 'movie', label: t.movie, icon: Film },
+    { id: 'series', label: t.series, icon: Tv },
   ];
 
   return (
-    <div className="flex items-stretch justify-between gap-4 py-0 border-b hairline">
-      {/* تبويبات النص — سطر تحته عند التفعيل بدل الدواء */}
+    <div className="flex flex-wrap items-center justify-between gap-3 my-6">
+      {/* Status tabs */}
       <div
-        className="flex items-end gap-5 overflow-x-auto no-scrollbar"
         role="tablist"
+        className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-full p-1"
+        style={{ background: 'var(--bg-elevated)', border: '1px solid var(--stroke)' }}
       >
         {tabs.map((tab) => {
+          const Icon = tab.icon;
           const isActive = activeTab === tab.id;
-          const count = getStatusCount(tab.id);
           return (
             <button
               key={tab.id}
               role="tab"
               aria-selected={isActive}
+              data-active={isActive}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative pb-3 pt-1 whitespace-nowrap text-[0.86rem] transition-colors cursor-pointer ${
-                isActive ? 'text-[#f3ecdd] font-semibold' : 'text-[#948b76] hover:text-[#cfc4ab]'
-              }`}
+              className="tab"
             >
-              {tab.label}
-              <span className={`text-[0.68rem] ms-1 tabular-nums ${isActive ? 'text-[#f2b441]' : 'text-[#6d6450]'}`}>
-                {count}
-              </span>
-              {isActive && (
-                <span
-                  aria-hidden
-                  className="absolute bottom-0 inset-x-0 h-0.5 bg-[#f2b441] rounded-full"
-                />
-              )}
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
+              <span className="tab-count">{getStatusCount(tab.id)}</span>
             </button>
           );
         })}
       </div>
 
-      {/* فلتر النوع */}
-      <div className="flex items-center pb-3">
+      {/* Type filter */}
+      <div className="seg" role="group" aria-label="type filter">
         {types.map((tp) => {
-          const isActive = filterType === tp.id;
+          const Icon = tp.icon;
           return (
             <button
               key={tp.id}
+              data-active={filterType === tp.id}
               onClick={() => setFilterType(tp.id)}
-              className={`px-2.5 py-1 text-[0.75rem] rounded-md transition-colors cursor-pointer ${
-                isActive
-                  ? 'bg-[#2a2317] text-[#f2b441]'
-                  : 'text-[#948b76] hover:text-[#cfc4ab]'
-              }`}
+              className="seg-item flex items-center gap-1.5"
             >
-              {tp.label}
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tp.label}</span>
             </button>
           );
         })}

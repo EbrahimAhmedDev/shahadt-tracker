@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Plus, Globe, Clapperboard } from 'lucide-react';
+import { Plus, Globe, Search, X } from 'lucide-react';
 import { useTracking } from '@/lib/store/tracking-context';
 
 interface NavbarProps {
@@ -11,97 +11,93 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenAddModal }) => {
   const { language, setLanguage, t, searchFilter, setSearchFilter, syncStatus } = useTracking();
 
-  const toggleLanguage = () => {
-    setLanguage(language === 'ar' ? 'en' : 'ar');
-  };
-
   const syncMeta = {
-    synced: { label: t.syncStatusCloud, dot: 'bg-[#7ba05a]' },
-    connecting: { label: t.syncStatusSyncing, dot: 'bg-[#f2b441] animate-pulse' },
-    local: { label: t.syncStatusLocal, dot: 'bg-[#948b76]' },
-    error: { label: t.syncStatusError, dot: 'bg-[#c45050]' },
-    off: { label: t.syncStatusLocal, dot: 'bg-[#948b76]' },
+    synced: { label: t.syncStatusCloud, color: 'var(--ok)' },
+    connecting: { label: t.syncStatusSyncing, color: 'var(--warn)' },
+    local: { label: t.syncStatusLocal, color: 'var(--text-low)' },
+    error: { label: t.syncStatusError, color: 'var(--accent)' },
+    off: { label: t.syncStatusLocal, color: 'var(--text-low)' },
   }[syncStatus];
 
-  const toggleSearch = () => {
-    if (searchFilter) setSearchFilter('');
-  };
-
   return (
-    <header className="sticky top-0 z-40 w-full border-b hairline bg-[#12100cee] backdrop-blur-sm">
-      <div className="max-w-6xl mx-auto px-5 sm:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-18 gap-4">
+    <header
+      className="sticky top-0 z-40 w-full"
+      style={{
+        background: 'rgba(15,17,21,.85)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid var(--stroke)',
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center gap-4 h-16">
 
-          {/* Logo — كيلّ المشروع */}
-          <div className="flex items-center gap-3 min-w-0">
-            <Clapperboard className="w-5 h-5 text-[#f2b441] shrink-0" strokeWidth={1.75} />
-            <div className="min-w-0">
-              <span className="text-xl font-bold text-[#f3ecdd] leading-none">{t.appTitle}</span>
-              <p className="text-[0.68rem] text-[#948b76] hidden sm:block mt-0.5 truncate">{t.tagline}</p>
-            </div>
-          </div>
-
-          {/* بحث */}
-          <div className="hidden md:block flex-1 max-w-sm mx-6">
-            <div className="relative">
-              <input
-                type="text"
-                value={searchFilter}
-                onChange={(e) => setSearchFilter(e.target.value)}
-                placeholder={t.searchPlaceholder}
-                className="field w-full text-[0.82rem] px-4 py-2"
-                aria-label={t.searchPlaceholder}
-              />
-              {searchFilter && (
-                <button
-                  onClick={toggleSearch}
-                  className="absolute top-1/2 -translate-y-1/2 text-[#948b76] hover:text-[#f3ecdd] text-xs transition-colors"
-                  style={{ insetInlineEnd: '0.9rem' }}
-                  aria-label={t.cancel}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* أزرار */}
+          {/* Logo */}
           <div className="flex items-center gap-2.5 shrink-0">
-            {/* حالة المزامنة */}
             <div
-              className="hidden lg:flex items-center gap-2 text-[0.72rem] text-[#948b76] pr-3"
-              style={{ borderInlineEnd: '1px solid var(--s-line)' }}
+              className="w-9 h-9 rounded-lg flex items-center justify-center"
+              style={{ background: 'var(--accent)' }}
             >
-              <span className={`w-1.5 h-1.5 rounded-full ${syncMeta.dot}`} aria-hidden />
-              <span>{syncMeta.label}</span>
+              <span className="text-white font-bold text-lg leading-none" style={{ marginTop: 2 }}>ش</span>
+            </div>
+            <div className="leading-none">
+              <div className="text-lg font-bold text-[var(--text-hi)]">{t.appTitle}</div>
+              <div className="text-[0.65rem] text-[var(--text-low)] mt-0.5 hidden sm:block">{t.tagline}</div>
+            </div>
+          </div>
+
+          {/* Search — desktop */}
+          <div className="hidden md:flex flex-1 max-w-lg mx-auto relative">
+            <Search className="absolute w-4 h-4 text-[var(--text-low)]" style={{ insetInlineStart: 12, top: '50%', transform: 'translateY(-50%)' }} />
+            <input
+              type="text"
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              placeholder={t.searchPlaceholder}
+              className="input input-search"
+              aria-label={t.searchPlaceholder}
+            />
+            {searchFilter && (
+              <span
+                onClick={() => setSearchFilter('')}
+                className="absolute cursor-pointer text-[var(--text-low)] hover:text-[var(--text-mid)]"
+                style={{ insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)' }}
+                aria-label={t.cancel}
+                role="button"
+                tabIndex={0}
+              >
+                <X className="w-3.5 h-3.5" />
+              </span>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="hidden lg:flex items-center gap-2 chip" aria-live="polite">
+              <span className="w-2 h-2 rounded-full" style={{ background: syncMeta.color }} aria-hidden />
+              <span className="text-[0.7rem]">{syncMeta.label}</span>
             </div>
 
-            <button
-              onClick={toggleLanguage}
-              className="btn-ghost flex items-center gap-1.5 px-3 py-2 text-[0.78rem]"
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span>{language === 'ar' ? 'EN' : 'ع'}</span>
+            <button onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')} className="btn btn-ghost btn-icon btn-sm">
+              <Globe className="w-4 h-4" />
+              <span className="text-[0.75rem] hidden sm:inline">{language === 'ar' ? 'EN' : 'ع'}</span>
             </button>
 
-            <button
-              onClick={onOpenAddModal}
-              className="btn-solid flex items-center gap-1.5 px-4 py-2 text-[0.82rem]"
-            >
+            <button onClick={onOpenAddModal} className="btn btn-primary">
               <Plus className="w-4 h-4" strokeWidth={2.5} />
               <span className="hidden sm:inline">{t.addMedia}</span>
             </button>
           </div>
         </div>
 
-        {/* بحث الجوال */}
-        <div className="pb-3 md:hidden">
+        {/* Search — mobile */}
+        <div className="pb-3 md:hidden relative">
+          <Search className="absolute w-4 h-4 text-[var(--text-low)]" style={{ insetInlineStart: 12, top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             placeholder={t.searchPlaceholder}
-            className="field w-full text-[0.82rem] px-4 py-2"
+            className="input input-search"
           />
         </div>
       </div>
