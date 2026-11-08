@@ -20,6 +20,8 @@ interface TrackingContextType {
   setLanguage: (lang: Language) => void;
   t: TranslationRecord;
   syncStatus: SyncStatus;
+  view: AppView;
+  setView: (v: AppView) => void;
   activeTab: WatchStatus | 'all';
   setActiveTab: (tab: WatchStatus | 'all') => void;
   filterType: 'all' | MediaType;
@@ -40,6 +42,8 @@ interface TrackingContextType {
 }
 
 export type SyncStatus = 'off' | 'local' | 'connecting' | 'synced' | 'error';
+export type { WatchStatus, MediaType } from '@/types/media';
+export type AppView = 'home' | 'stats' | 'settings' | 'about';
 
 const STORAGE_KEY = 'shahadt_tracker_items_v1';
 const LANG_STORAGE_KEY = 'shahadt_tracker_lang_v1';
@@ -188,6 +192,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   const [searchFilter, setSearchFilter] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('local');
+  const [view, setView] = useState<AppView>('home');
 
   // Keep a ref of items for async sync functions to read the latest version.
   const itemsRef = useRef<UserTracking[]>([]);
@@ -586,6 +591,8 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
         setLanguage,
         t,
         syncStatus,
+        view,
+        setView,
         activeTab,
         setActiveTab,
         filterType,

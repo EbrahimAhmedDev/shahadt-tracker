@@ -1,76 +1,66 @@
 'use client';
 
 import React from 'react';
-import { PlayCircle, CheckCircle2, Bookmark, XCircle, LayoutGrid, Film, Tv } from 'lucide-react';
-import { useTracking } from '@/lib/store/tracking-context';
-import { WatchStatus, MediaType } from '@/types/media';
+import { LayoutGrid, Film, Tv } from 'lucide-react';
+import { useTracking, WatchStatus, MediaType } from '@/lib/store/tracking-context';
 
 export const StatusFilterTabs: React.FC = () => {
-  const { activeTab, setActiveTab, filterType, setFilterType, items, t } = useTracking();
+  const { activeTab, setActiveTab, filterType, setFilterType, t } = useTracking();
 
-  const getStatusCount = (status: WatchStatus | 'all') => {
-    if (status === 'all') return items.length;
-    return items.filter((i) => i.status === status).length;
-  };
-
-  const tabs: { id: WatchStatus | 'all'; label: string; icon: React.ElementType }[] = [
-    { id: 'watching', label: t.watching, icon: PlayCircle },
-    { id: 'completed', label: t.completed, icon: CheckCircle2 },
-    { id: 'plan_to_watch', label: t.planToWatch, icon: Bookmark },
-    { id: 'dropped', label: t.dropped, icon: XCircle },
-    { id: 'all', label: t.all, icon: LayoutGrid },
+  const statusTabs: { id: WatchStatus | 'all'; label: string }[] = [
+    { id: 'all', label: t.allCases },
+    { id: 'completed', label: t.completed },
+    { id: 'plan_to_watch', label: t.planToWatch },
+    { id: 'dropped', label: t.dropped },
   ];
 
-  const types: { id: 'all' | MediaType; label: string; icon: React.ElementType }[] = [
-    { id: 'all', label: t.all, icon: LayoutGrid },
+  const typeTabs: { id: 'all' | MediaType; label: string; icon: React.ElementType }[] = [
+    { id: 'all', label: t.allTitles, icon: LayoutGrid },
     { id: 'movie', label: t.movie, icon: Film },
     { id: 'series', label: t.series, icon: Tv },
   ];
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 my-6">
-      {/* Status tabs */}
-      <div
-        role="tablist"
-        className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-full p-1"
-        style={{ background: 'var(--bg-elevated)', border: '1px solid var(--stroke)' }}
-      >
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              role="tab"
-              aria-selected={isActive}
-              data-active={isActive}
-              onClick={() => setActiveTab(tab.id)}
-              className="tab"
-            >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
-              <span className="tab-count">{getStatusCount(tab.id)}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Type filter */}
-      <div className="seg" role="group" aria-label="type filter">
-        {types.map((tp) => {
+    <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+      {/* Type pills (start side) */}
+      <div className="flex items-center gap-2">
+        {typeTabs.map((tp) => {
           const Icon = tp.icon;
+          const isActive = filterType === tp.id;
           return (
             <button
               key={tp.id}
-              data-active={filterType === tp.id}
               onClick={() => setFilterType(tp.id)}
-              className="seg-item flex items-center gap-1.5"
+              className={isActive ? 'btn btn-primary btn-sm' : 'btn btn-sm'}
             >
               <Icon className="w-3.5 h-3.5" />
               <span>{tp.label}</span>
             </button>
           );
         })}
+      </div>
+
+      {/* Status pills (end side) */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+        {statusTabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={isActive ? 'btn btn-primary btn-sm' : 'btn btn-sm'}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+        {/* watching pill (active look when selected) */}
+        <button
+          onClick={() => setActiveTab(activeTab === 'watching' ? 'all' : 'watching')}
+          className={activeTab === 'watching' ? 'btn btn-primary btn-sm' : 'btn btn-sm'}
+        >
+          {t.watching}
+        </button>
       </div>
     </div>
   );

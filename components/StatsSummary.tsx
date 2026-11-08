@@ -1,41 +1,41 @@
 'use client';
 
 import React from 'react';
-import { Film, Tv, CheckCircle2, Star } from 'lucide-react';
+import { Film, Tv, PlayCircle, Star } from 'lucide-react';
 import { useTracking } from '@/lib/store/tracking-context';
 
 export const StatsSummary: React.FC = () => {
   const { stats, t } = useTracking();
 
-  const statsList = [
-    { label: t.moviesCount, value: String(stats.totalMovies), Icon: Film },
-    { label: t.seriesCount, value: String(stats.totalSeries), Icon: Tv },
-    { label: t.episodesWatched, value: String(stats.totalEpisodes), Icon: CheckCircle2 },
-    { label: t.avgRating, value: `${stats.avgRating}/10`, Icon: Star },
+  const tiles = [
+    { value: String(stats.totalMovies), label: t.moviesCount, Icon: Film, color: 'var(--violet)', soft: 'var(--violet-soft)' },
+    { value: String(stats.totalSeries), label: t.seriesCount, Icon: Tv, color: 'var(--green)', soft: 'var(--green-soft)' },
+    { value: String(stats.totalEpisodes), label: t.episodesWatched, Icon: PlayCircle, color: 'var(--orange)', soft: 'var(--orange-soft)' },
+    { value: stats.avgRating, label: t.avgRating, Icon: Star, color: 'var(--yellow)', soft: 'rgba(250,204,21,.14)', fill: true },
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 my-8">
-      {statsList.map((stat, i) => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {tiles.map((tile, i) => (
         <div
           key={i}
-          className="rounded-[var(--r-md)] px-4 py-3.5 flex items-center gap-3.5"
-          style={{
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--stroke)',
-          }}
+          className="panel flex items-center gap-4 px-5 py-4"
         >
           <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-            style={{ background: 'var(--bg-raised)', border: '1px solid var(--stroke)' }}
+            className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+            style={{ background: tile.soft }}
           >
-            <stat.Icon className="w-4 h-4 text-[var(--text-mid)]" />
+            <tile.Icon
+              className="w-6 h-6"
+              style={{ color: tile.color }}
+              fill={tile.fill ? tile.color : 'none'}
+            />
           </div>
           <div className="min-w-0">
-            <div className="nums text-xl sm:text-2xl font-bold text-[var(--text-hi)] leading-tight">
-              {stat.value}
+            <div className="nums text-[1.55rem] font-bold leading-tight" style={{ color: 'var(--text-hi)' }}>
+              {tile.value}
             </div>
-            <div className="text-[0.72rem] text-[var(--text-low)] truncate">{stat.label}</div>
+            <div className="text-[0.78rem] text-[var(--text-low)] truncate">{tile.label}</div>
           </div>
         </div>
       ))}

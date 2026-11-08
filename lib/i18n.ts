@@ -59,7 +59,25 @@ export type TranslationRecord = Record<
   | 'syncStatusCloud'
   | 'syncStatusLocal'
   | 'syncStatusError'
-  | 'syncStatusSyncing',
+  | 'syncStatusSyncing'
+  | 'navHome'
+  | 'navMyStats'
+  | 'navSettings'
+  | 'navAbout'
+  | 'connected'
+  | 'lastWatched'
+  | 'watchNow'
+  | 'continueLater'
+  | 'allTitles'
+  | 'allCases'
+  | 'seasonShort'
+  | 'remainingEpisodes'
+  | 'settingsLang'
+  | 'settingsSync'
+  | 'settingsData'
+  | 'clearLocalData'
+  | 'aboutBody'
+  ,
   string
 >;
 
@@ -124,6 +142,23 @@ export const translations: Record<Language, TranslationRecord> = {
     syncStatusLocal: 'وضع محلي',
     syncStatusError: 'مزامنة غير متاحة',
     syncStatusSyncing: 'جاري المزامنة…',
+    navHome: 'الرئيسية',
+    navMyStats: 'إحصائياتي',
+    navSettings: 'الإعدادات',
+    navAbout: 'حول التطبيق',
+    connected: 'متصل',
+    lastWatched: 'آخر ما شاهدته',
+    watchNow: 'متابعة الأن',
+    continueLater: 'متابعة لاحقاً',
+    allTitles: 'كل الأعمال',
+    allCases: 'كل الحالات',
+    seasonShort: 'م',
+    remainingEpisodes: 'حلقة',
+    settingsLang: 'اللغة',
+    settingsSync: 'المزامنة',
+    settingsData: 'البيانات',
+    clearLocalData: 'مسح النسخة المحلية',
+    aboutBody: 'شاهدت هو دفترك الشخصي لتتبع الأفلام والمسلسلات: بتسجل كل عمل بضغطة، البيانات تتجلب تلقائياً من توب سينما وأهواك، وخلفها مزامنة سحابية مجانية عبر Supabase.',
   },
   en: {
     appTitle: 'Shahadt',
@@ -185,5 +220,22 @@ export const translations: Record<Language, TranslationRecord> = {
     syncStatusLocal: 'Local mode',
     syncStatusError: 'Sync unavailable',
     syncStatusSyncing: 'Syncing…',
+    navHome: 'Home',
+    navMyStats: 'My Stats',
+    navSettings: 'Settings',
+    navAbout: 'About',
+    connected: 'Connected',
+    lastWatched: 'Recently watched',
+    watchNow: 'Continue now',
+    continueLater: 'Save for later',
+    allTitles: 'All titles',
+    allCases: 'All states',
+    seasonShort: 'S',
+    remainingEpisodes: 'episodes',
+    settingsLang: 'Language',
+    settingsSync: 'Sync',
+    settingsData: 'Data',
+    clearLocalData: 'Clear local copy',
+    aboutBody: 'Shahadt is your personal watch log: add any movie or series with one tap, fetch its data automatically from Top Cinema & Ahwak, and sync it for free on Supabase.',
   },
 } as const;
