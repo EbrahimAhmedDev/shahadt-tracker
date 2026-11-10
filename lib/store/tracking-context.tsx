@@ -48,53 +48,7 @@ export type AppView = 'home' | 'stats' | 'settings' | 'about';
 const STORAGE_KEY = 'shahadt_tracker_items_v1';
 const LANG_STORAGE_KEY = 'shahadt_tracker_lang_v1';
 
-const INITIAL_DEMO_ITEMS: UserTracking[] = [
-  {
-    id: 'demo-1',
-    mediaId: 'media-1',
-    status: 'watching',
-    currentSeason: 1,
-    currentEpisode: 8,
-    totalEpisodes: 30,
-    userRating: 9.5,
-    userNotes: 'أداء تمثيلي استثنائي وإخراج سينمائي مبهر.',
-    updatedAt: new Date().toISOString(),
-    media: {
-      id: 'media-1',
-      titleAr: 'مسلسل الحشاشين',
-      titleEn: 'The Assassins',
-      type: 'series',
-      posterUrl: 'https://topcinemaa.vip/wp-content/uploads/2026/08/9pKPTugulAt0EtH0g4gvJGffPSg-367x550.jpg',
-      releaseYear: 2024,
-      overview: 'تدور الأحداث في إطار تاريخي، في القرن الحادي عشر، حول زعيم الحشاشين حسن الصباح، وقيادته للفرقة التي اشتهرت بتنفيذ عمليات اغتيال دموية.',
-      source: 'topcinema',
-      sourceUrl: 'https://topcinemaa.vip',
-    },
-  },
-  {
-    id: 'demo-2',
-    mediaId: 'media-2',
-    status: 'completed',
-    currentSeason: 1,
-    currentEpisode: 1,
-    totalEpisodes: 1,
-    userRating: 9.0,
-    userNotes: 'أجواء مظلمة ممتازة وموسيقى تصويرية عبقرية.',
-    completedAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    media: {
-      id: 'media-2',
-      titleAr: 'فيلم The Batman',
-      titleEn: 'The Batman',
-      type: 'movie',
-      posterUrl: 'https://topcinemaa.vip/wp-content/uploads/2026/08/9pKPTugulAt0EtH0g4gvJGffPSg.jpg',
-      releaseYear: 2022,
-      overview: 'في عامه الثاني من مكافحة الجريمة، يسعى باتمان لكشف الفساد في مدينة غوثام بينما يتعقب قاتلاً متسلسلاً يُعرف باسم ريدلر.',
-      source: 'topcinema',
-      sourceUrl: 'https://topcinemaa.vip',
-    },
-  },
-];
+const INITIAL_DEMO_ITEMS: UserTracking[] = [];
 
 const TrackingContext = createContext<TrackingContextType | undefined>(undefined);
 
