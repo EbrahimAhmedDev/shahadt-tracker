@@ -24,6 +24,7 @@ export type TranslationRecord = Record<
   | 'season'
   | 'currentEpisode'
   | 'currentSeason'
+  | 'lastEpisodeReached'
   | 'totalEpisodes'
   | 'incrementEpisode'
   | 'markCompleted'
@@ -106,6 +107,7 @@ export const translations: Record<Language, TranslationRecord> = {
     season: 'موسم',
     currentEpisode: 'الحلقة الحالية',
     currentSeason: 'الموسم الحالي',
+    lastEpisodeReached: 'آخر حلقة وصلتها (0 = لسه بدأت)',
     totalEpisodes: 'إجمالي الحلقات',
     incrementEpisode: '+1 حلقة',
     markCompleted: 'انتهيت منه 🎉',
@@ -184,6 +186,7 @@ export const translations: Record<Language, TranslationRecord> = {
     season: 'Season',
     currentEpisode: 'Current Episode',
     currentSeason: 'Current Season',
+    lastEpisodeReached: 'Last episode reached (0 = not started)',
     totalEpisodes: 'Total Episodes',
     incrementEpisode: '+1 Ep',
     markCompleted: 'Completed 🎉',

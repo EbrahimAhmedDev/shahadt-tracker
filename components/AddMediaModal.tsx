@@ -26,7 +26,8 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
 
   // Configuration state
   const [watchStatus, setWatchStatus] = useState<WatchStatus>('watching');
-  const [currentEpisode, setCurrentEpisode] = useState<number>(1);
+  const [currentSeason, setCurrentSeason] = useState<number>(1);
+  const [currentEpisode, setCurrentEpisode] = useState<number>(0);
   const [totalEpisodes, setTotalEpisodes] = useState<number | undefined>(undefined);
   const [rating, setRating] = useState<number>(8.5);
   const [userNotes, setUserNotes] = useState<string>('');
@@ -75,6 +76,7 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
       },
       {
         status: watchStatus,
+        currentSeason: selectedResult.type === 'series' ? currentSeason : undefined,
         currentEpisode: selectedResult.type === 'series' ? currentEpisode : 1,
         totalEpisodes,
         userRating: rating > 0 ? rating : undefined,
@@ -98,6 +100,7 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
       },
       {
         status: watchStatus,
+        currentSeason: manualType === 'series' ? currentSeason : undefined,
         currentEpisode: manualType === 'series' ? currentEpisode : 1,
         totalEpisodes,
         userRating: rating > 0 ? rating : undefined,
@@ -303,10 +306,14 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                   </div>
 
                   {selectedResult.type === 'series' && (
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                       <div>
-                        <div className="section-label">{t.currentEpisode}</div>
-                        <input type="number" min={1} value={currentEpisode} onChange={(e) => setCurrentEpisode(parseInt(e.target.value) || 1)} className="input nums" />
+                        <div className="section-label">{t.currentSeason}</div>
+                        <input type="number" min={1} value={currentSeason} onChange={(e) => setCurrentSeason(parseInt(e.target.value) || 1)} className="input nums" />
+                      </div>
+                      <div>
+                        <div className="section-label">{t.lastEpisodeReached}</div>
+                        <input type="number" min={0} value={currentEpisode} onChange={(e) => setCurrentEpisode(parseInt(e.target.value) || 0)} className="input nums" />
                       </div>
                       <div>
                         <div className="section-label">{t.totalEpisodes} (اختياري)</div>
@@ -397,6 +404,23 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                 <div className="section-label">{t.selectStatus}</div>
                 {statusButtons}
               </div>
+
+              {manualType === 'series' && (
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <div className="section-label">{t.currentSeason}</div>
+                    <input type="number" min={1} value={currentSeason} onChange={(e) => setCurrentSeason(parseInt(e.target.value) || 1)} className="input nums" />
+                  </div>
+                  <div>
+                    <div className="section-label">{t.lastEpisodeReached}</div>
+                    <input type="number" min={0} value={currentEpisode} onChange={(e) => setCurrentEpisode(parseInt(e.target.value) || 0)} className="input nums" />
+                  </div>
+                  <div>
+                    <div className="section-label">{t.totalEpisodes} (اختياري)</div>
+                    <input type="number" min={1} placeholder="مثلاً 30" value={totalEpisodes || ''} onChange={(e) => setTotalEpisodes(e.target.value ? parseInt(e.target.value) : undefined)} className="input nums" />
+                  </div>
+                </div>
+              )}
 
               <button type="submit" className="btn btn-primary w-full btn-lg">
                 {t.addToTracker}
